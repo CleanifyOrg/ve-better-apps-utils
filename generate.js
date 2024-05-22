@@ -1,6 +1,16 @@
 const fs = require("fs");
 const path = require("path");
 
+// Get the number of cycles from the command-line arguments
+const args = process.argv.slice(2);
+const numberOfCycles = args.length > 0 ? parseInt(args[0], 10) : 5000;
+if (isNaN(numberOfCycles) || numberOfCycles <= 0) {
+  console.error("Please provide a valid number of items.");
+  process.exit(1);
+} else {
+  console.log(`Generating ${numberOfCycles} items...`);
+}
+
 // Directories
 const srcDir = path.join(__dirname, "src");
 const outputDir = path.join(__dirname, "output");
@@ -25,9 +35,9 @@ fs.mkdirSync(imagesOutputDir);
 // Read and parse the initial JSON
 const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, "utf-8"));
 
-// Generate 5000 objects
+// Generate {numberOfCycles} objects
 const generatedData = [];
-for (let i = 1; i <= 5000; i++) {
+for (let i = 1; i <= numberOfCycles; i++) {
   let newItem = JSON.parse(JSON.stringify(jsonData[0]));
   newItem.tokenId = i.toString();
   generatedData.push(newItem);

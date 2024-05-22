@@ -66,6 +66,13 @@ Run the script:
     yarn generate
     ```
 
+This will generate 5000 items. If you want to generate a different number of items, you can pass the desired
+number as an argument:
+
+    ```bash
+    yarn generate 100
+    ```
+
 ## Output
 
 After running the script, an `output` folder will be created in the project root containing:
