@@ -1,6 +1,8 @@
-# JSON and Image File Generator
+# Vorj NFT Metadata Generator
 
-This project contains a Node.js script that generates a JSON file with 5000 objects and copies an image file 5000 times, each with a unique name based on the `tokenId`.
+[Vorj](https://vorj.app/dashboard) needs a unique image for each ERC721 NFT and a custom metadata json file. 
+
+This generator will avoid you to copy/paste 5000 times the same file and prepare for you the correct metadata for each of them by doing it for you.
 
 ## Prerequisites
 
@@ -63,19 +65,21 @@ Navigate to the project directory:
 Run the script:
 
     ```bash
-    yarn generate
-    ```
-
-This will generate 5000 items. If you want to generate a different number of items, you can pass the desired
-number as an argument:
-
-    ```bash
     yarn generate 100
     ```
+where 100 is the number of nfts you want to mint.
 
 ## Output
 
 After running the script, an `output` folder will be created in the project root containing:
 
-metadata.json: A JSON file with 5000 objects, each with a unique tokenId.
-images folder with 5000 image files: Named from 1.png to 5000.png, each a copy of the original image.png.
+- images
+- metadata.json
+
+## Mint
+
+Go to [Vorj](https://vorj.app/dashboard), create smart contract, upload all the images and the json file.
+
+
+
+
