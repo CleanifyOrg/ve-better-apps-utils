@@ -13,7 +13,7 @@ This generator will avoid you to copy/paste 5000 times the same file and prepare
 1. **Create the `src` folder**: Ensure you have a `src` directory in the project root.
 2. **Add `metadata.json` and `image.jpeg`**: Place your initial JSON file and image file inside the `src` directory.
 
-### Example `metadata.json` Content
+### Template for `metadata.json`
 
 ```json
 [
