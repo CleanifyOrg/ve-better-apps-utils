@@ -65,7 +65,7 @@ Navigate to the project directory:
 Run the script:
 
     ```bash
-    yarn generate 100
+    node generate 100
     ```
 where 100 is the number of nfts you want to mint.
 
