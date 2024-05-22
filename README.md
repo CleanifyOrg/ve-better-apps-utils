@@ -1,4 +1,4 @@
-# Vorj NFT Metadata Generator
+# Vorj NFT Generator
 
 [Vorj](https://vorj.app/dashboard) needs a unique image for each ERC721 NFT and a custom metadata json file. 
 
