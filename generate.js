@@ -4,6 +4,7 @@ const path = require("path");
 // Directories
 const srcDir = path.join(__dirname, "src");
 const outputDir = path.join(__dirname, "output");
+const imagesOutputDir = path.join(outputDir, "/images");
 
 // Read the initial JSON file
 const jsonFilePath = path.join(srcDir, "metadata.json");
@@ -12,6 +13,10 @@ const imageFilePath = path.join(srcDir, "image.jpeg");
 // Ensure the output directory exists
 if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir);
+}
+// Ensure the output directory exists
+if (!fs.existsSync(imagesOutputDir)) {
+  fs.mkdirSync(imagesOutputDir);
 }
 
 // Read and parse the initial JSON
@@ -25,7 +30,7 @@ for (let i = 1; i <= 5000; i++) {
   generatedData.push(newItem);
 
   // Copy and rename the image
-  const newImagePath = path.join(`${outputDir}/images`, `${i}.png`);
+  const newImagePath = path.join(imagesOutputDir, `${i}.png`);
   fs.copyFileSync(imageFilePath, newImagePath);
 }
 
