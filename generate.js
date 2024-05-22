@@ -10,14 +10,17 @@ const imagesOutputDir = path.join(outputDir, "/images");
 const jsonFilePath = path.join(srcDir, "metadata.json");
 const imageFilePath = path.join(srcDir, "image.jpeg");
 
-// Ensure the output directory exists
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir);
+// Reset the output directory
+if (fs.existsSync(imagesOutputDir)) {
+  fs.rmSync(imagesOutputDir, { recursive: true });
 }
-// Ensure the output directory exists
-if (!fs.existsSync(imagesOutputDir)) {
-  fs.mkdirSync(imagesOutputDir);
+if (fs.existsSync(outputDir)) {
+  fs.rmSync(outputDir, { recursive: true });
 }
+
+// Ensure the output directory exists
+fs.mkdirSync(outputDir);
+fs.mkdirSync(imagesOutputDir);
 
 // Read and parse the initial JSON
 const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, "utf-8"));
