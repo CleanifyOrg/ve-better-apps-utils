@@ -18,7 +18,7 @@ const imagesOutputDir = path.join(outputDir, "/images");
 
 // Read the initial JSON file
 const jsonFilePath = path.join(srcDir, "metadata.json");
-const imageFilePath = path.join(srcDir, "image.jpeg");
+const imageFilePath = path.join(srcDir, "image.png");
 
 // Reset the output directory
 if (fs.existsSync(imagesOutputDir)) {
