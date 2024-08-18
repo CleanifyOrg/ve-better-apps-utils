@@ -56,3 +56,16 @@ export const confirmVot3Swap = async (): Promise<boolean> => {
 
   return res.answer === "Yes";
 };
+
+export const confirmVot3Distribution = async (): Promise<boolean> => {
+  const res = await enquirer.prompt<ConfirmationResponse>([
+    {
+      type: "select",
+      name: "answer",
+      message: `Proceed with distributing VOT3 to the other addresses?`,
+      choices: ["No", "Yes"],
+    },
+  ]);
+
+  return res.answer === "Yes";
+};
