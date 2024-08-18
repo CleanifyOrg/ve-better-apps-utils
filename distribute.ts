@@ -268,8 +268,28 @@ export const distributeVot3 = async (
       ) {
         const requiredDeposit = depositAmount - b3trBalance - vot3Balance;
         console.log("Need deposit, sending B3TR", requiredDeposit);
-        await // @ts-ignore
-        (await B3TR.transact.transfer(wallet.address, requiredDeposit)).wait();
+
+        const transferClauses = [
+          {
+            clause: {
+              to: Addresses.b3tr,
+              value: "0x0",
+              data: new Interface(B3TR.abi).encodeFunctionData("transfer", [
+                wallet.address,
+                requiredDeposit,
+              ]),
+            },
+            functionFragment: coder
+              .createInterface(Vot3Abi)
+              .getFunction("transfer") as FunctionFragment,
+          },
+        ];
+        await (
+          await thor.contracts.executeMultipleClausesTransaction(
+            transferClauses,
+            rootSigner
+          )
+        ).wait();
 
         b3trBalance = BigInt(
           (
@@ -288,6 +308,14 @@ export const distributeVot3 = async (
               [wallet.address]
             )
           )[0]
+        );
+
+        console.log(
+          "Balance after transfer",
+          "B3TR:",
+          formatUnits(b3trBalance),
+          "VOT3:",
+          formatUnits(vot3Balance)
         );
       } else if (
         b3trBalance + vot3Balance < depositAmount &&
@@ -404,6 +432,8 @@ export const distributeVot3 = async (
             )
           )[0]
         );
+
+        console.log("Balance after unstake", b3trBalance, vot3Balance);
       }
 
       if (b3trBalance > BigInt(0)) {
@@ -461,7 +491,10 @@ export const distributeVot3 = async (
         );
       }
 
-      if (rootClauses.length >= 125) {
+      if (
+        rootClauses.length >= 125 ||
+        (accountIndex === amountOfAccounts - 1 && rootClauses.length > 0)
+      ) {
         await thor.contracts.executeMultipleClausesTransaction(
           rootClauses,
           rootSigner
