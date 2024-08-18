@@ -4,7 +4,9 @@
 
 ## Setup
 
-### Template for `metadata.json`
+```bash
+yarn install
+```
 
 ## Usage
 
@@ -17,5 +19,5 @@ Navigate to the project directory:
 Run the script:
 
     ```bash
-    node generate 100
+    yarn distribute
     ```
