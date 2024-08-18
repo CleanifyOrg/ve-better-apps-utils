@@ -6,6 +6,8 @@
     "distribute": "ts-node distribute.ts"
   },
   "dependencies": {
+    "@vechain/sdk-core": "^1.0.0-beta.29",
+    "@vechain/sdk-network": "^1.0.0-beta.29",
     "enquirer": "^2.4.1",
     "inquirer": "^10.1.8",
     "winston": "^3.14.2"

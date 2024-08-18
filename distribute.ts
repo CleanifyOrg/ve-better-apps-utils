@@ -1,26 +1,144 @@
-import { getAmountOfAccounts } from "./helpers/CliArguments";
-
-const Addresses = {
-  b3tr: "0x5ef79995FE8a89e0812330E4378eB2660ceDe699",
-  vot3: "0x76Ca782B59C74d088C7D2Cce2f211BC00836c602",
-  rewarder: "0x838A33AF756a6366f93e201423E1425f67eC0Fa7",
-  gov: "0x89A00Bb0947a30FF95BEeF77a66AEdE3842Fe5B7",
-  nft: "0x93B8cD34A7Fc4f53271b9011161F7A2B5fEA9D1F",
-};
-
-const appIds = [
-  "0x2fc30c2ad41a2994061efaf218f1d52dc92bc4a31a0f02a4916490076a7a393a",
-  "0x6c977a18d427360e27c3fc2129a6942acd4ece2c8aaeaf4690034931dc5ba7f9",
-  "0x74133534672eca50a67f8b20bf17dd731b70d83f0a12e3500fca0793fca51c7d",
-  "0x821a9ae30590c7c11e0ebc03b27902e8cae0f320ad27b0f5bde9f100eebcb5a7",
-  "0x899de0d0f0b39e484c8835b2369194c4c102b230c813862db383d44a4efe14d3",
-  "0x9643ed1637948cc571b23f836ade2bdb104de88e627fa6e8e3ffef1ee5a1739a",
-  "0xa30ddd53895674f3517ed4eb8f7261a4287ec1285fdd13b1c19a1d7009e5b7e3",
-  "0xcd9f16381818b575a55661602638102b2b8497a202bb2497bb2a3a2cd438e85d",
-];
+import {
+  confirmVot3Swap,
+  getAmountOfAccounts,
+  getRootSigner,
+} from "./helpers/CliArguments";
+import {
+  ThorClient,
+  Contract,
+  VeChainProvider,
+  ProviderInternalBaseWallet,
+  ContractClause,
+} from "@vechain/sdk-network";
+import { clauseBuilder, coder } from "@vechain/sdk-core";
+import { Wallet, Interface, formatUnits, FunctionFragment } from "ethers";
+import { Addresses } from "./helpers/constants";
+import { B3trAbi, Vot3Abi } from "./helpers/Abis";
+const thor = ThorClient.fromUrl("https://node.vechain.energy");
+const sleep = (s: number) =>
+  new Promise((resolve) => setTimeout(resolve, s * 1000));
 
 async function main() {
+  // Ask user the amount of accounts to distribute to and the root signer mnemonic
   const amountOfAccounts = await getAmountOfAccounts();
+  const mnemonic = await getRootSigner();
+
+  // Retrieve the root signer wallet and account, WARNING: uses the ethereum derivation path
+  const rootWallet = Wallet.fromPhrase(mnemonic);
+
+  const rootAccount = {
+    privateKey: Buffer.from(rootWallet.privateKey.slice(2), "hex"),
+    address: rootWallet.address,
+  };
+  const provider = new VeChainProvider(
+    thor,
+    new ProviderInternalBaseWallet([rootAccount])
+  );
+  const rootSigner = await provider.getSigner(rootAccount.address);
+
+  if (!rootSigner) {
+    throw new Error("Root signer is null");
+  }
+
+  console.log(`Root signer address: ${rootAccount.address}`);
+
+  const B3TR = new Contract(Addresses.b3tr, B3trAbi, thor, rootSigner);
+
+  const VOT3 = new Contract(Addresses.vot3, Vot3Abi, thor, rootSigner);
+
+  const [rootB3trBalanceResult, rootVot3BalanceResult] = await Promise.all([
+    thor.contracts.executeCall(
+      Addresses.b3tr,
+      "balanceOf(address) returns(uint256)" as any as FunctionFragment,
+      [rootWallet.address]
+    ),
+    thor.contracts.executeCall(
+      Addresses.vot3,
+      "balanceOf(address) returns(uint256)" as any as FunctionFragment,
+      [rootWallet.address]
+    ),
+  ]);
+
+  let rootB3trBalance = BigInt(rootB3trBalanceResult[0]);
+  let rootVot3Balance = BigInt(rootVot3BalanceResult[0]);
+
+  console.log(
+    `Root signer has ${formatUnits(
+      rootB3trBalance.toString(),
+      18
+    )} B3TR and ${formatUnits(rootVot3Balance.toString(), 18)} VOT3`
+  );
+
+  const proceed = await confirmVot3Swap();
+  if (!proceed) {
+    console.log("Exiting...");
+    return;
+  }
+
+  if (rootB3trBalance > BigInt(0)) {
+    console.log("Converting B3TR to VOT3 on root", rootB3trBalance);
+    const clauses: ContractClause[] = [
+      {
+        clause: {
+          to: Addresses.b3tr,
+          value: "0x0",
+          data: new Interface(B3TR.abi).encodeFunctionData("approve", [
+            Addresses.vot3,
+            rootB3trBalance,
+          ]),
+        },
+        functionFragment: coder
+          .createInterface(B3trAbi)
+          .getFunction("approve") as FunctionFragment,
+      },
+      {
+        clause: {
+          to: Addresses.vot3,
+          value: "0x0",
+          data: new Interface(VOT3.abi).encodeFunctionData("convertToVOT3", [
+            rootB3trBalance,
+          ]),
+        },
+        functionFragment: coder
+          .createInterface(Vot3Abi)
+          .getFunction("convertToVOT3") as FunctionFragment,
+      },
+    ];
+
+    await (
+      await thor.contracts.executeMultipleClausesTransaction(
+        clauses,
+        rootSigner
+      )
+    ).wait();
+    await sleep(10);
+
+    rootB3trBalance = BigInt(
+      (
+        await thor.contracts.executeCall(
+          Addresses.b3tr,
+          "balanceOf(address) returns(uint256)" as any as FunctionFragment,
+          [rootWallet.address]
+        )
+      )[0]
+    );
+    rootVot3Balance = BigInt(
+      (
+        await thor.contracts.executeCall(
+          Addresses.vot3,
+          "balanceOf(address) returns(uint256)" as any as FunctionFragment,
+          [rootWallet.address]
+        )
+      )[0]
+    );
+  }
+
+  console.log(
+    `Root signer now has ${formatUnits(
+      rootB3trBalance.toString(),
+      18
+    )} B3TR and ${formatUnits(rootVot3Balance.toString(), 18)} VOT3`
+  );
 }
 
 // Execute the main function

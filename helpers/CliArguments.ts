@@ -5,6 +5,10 @@ type AmountOfAccountsResponse = {
   amount: string;
 };
 
+type ConfirmationResponse = {
+  answer: "No" | "Yes";
+};
+
 export const getAmountOfAccounts = async (): Promise<number> => {
   const res = await enquirer.prompt<AmountOfAccountsResponse>([
     {
@@ -26,4 +30,29 @@ export const getAmountOfAccounts = async (): Promise<number> => {
     return getAmountOfAccounts();
   }
   return amountOfAccounts;
+};
+
+export const getRootSigner = async (): Promise<string> => {
+  const res = await enquirer.prompt<{ rootSigner: string }>([
+    {
+      type: "input",
+      name: "rootSigner",
+      message: "Enter the root signer mnemonic",
+    },
+  ]);
+
+  return res.rootSigner;
+};
+
+export const confirmVot3Swap = async (): Promise<boolean> => {
+  const res = await enquirer.prompt<ConfirmationResponse>([
+    {
+      type: "select",
+      name: "answer",
+      message: `Proceed with swapping B3TR for VOT3 on the root account?`,
+      choices: ["No", "Yes"],
+    },
+  ]);
+
+  return res.answer === "Yes";
 };
