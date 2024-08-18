@@ -1,5 +1,18 @@
 {
-  "name": "vorj-nft-generator",
+  "name": "sybil-dan",
   "version": "0.0.1",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "distribute": "ts-node distribute.ts"
+  },
+  "dependencies": {
+    "enquirer": "^2.4.1",
+    "inquirer": "^10.1.8",
+    "winston": "^3.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
 }
