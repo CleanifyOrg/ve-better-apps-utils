@@ -16,8 +16,14 @@ Navigate to the project directory:
     cd sybil-dan
     ```
 
-Run the script:
+Distribute / Withdraw tokens:
 
     ```bash
     yarn distribute
     ```
+
+Vote for random apps:
+
+    ````bash
+    yarn cast-round-vote
+    ````

@@ -69,3 +69,16 @@ export const confirmVot3Distribution = async (): Promise<boolean> => {
 
   return res.answer === "Yes";
 };
+
+export const confirmVoteRound = async (): Promise<boolean> => {
+  const res = await enquirer.prompt<ConfirmationResponse>([
+    {
+      type: "select",
+      name: "answer",
+      message: `Proceed with equaly voting for apps in this round?`,
+      choices: ["No", "Yes"],
+    },
+  ]);
+
+  return res.answer === "Yes";
+};

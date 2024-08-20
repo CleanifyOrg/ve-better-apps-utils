@@ -229,7 +229,7 @@ export const distributeVot3 = async (
 
   const rootClauses = [];
   for (
-    let accountIndex = 20000;
+    let accountIndex = 0;
     accountIndex < amountOfAccounts;
     accountIndex += 1
   ) {

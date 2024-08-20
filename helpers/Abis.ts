@@ -130,3 +130,29 @@ export const Vot3Abi = [
     type: "function",
   },
 ];
+
+export const GovAbi = [
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "roundId",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes32[]",
+        name: "appIds",
+        type: "bytes32[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "voteWeights",
+        type: "uint256[]",
+      },
+    ],
+    name: "castVote",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
