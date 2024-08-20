@@ -191,6 +191,31 @@ export const distributeVot3 = async (
   const B3TR = new Contract(Addresses.b3tr, B3trAbi, thor, rootSigner);
   const VOT3 = new Contract(Addresses.vot3, Vot3Abi, thor, rootSigner);
 
+  const currentRoundId = BigInt(
+    (
+      await thor.contracts.executeCall(
+        Addresses.gov,
+        "currentRoundId() returns(uint256)" as any as FunctionFragment,
+        []
+      )
+    )[0]
+  );
+  const currentRoundSnapshot = BigInt(
+    (
+      await thor.contracts.executeCall(
+        Addresses.gov,
+        "roundSnapshot(uint256) returns(uint256)" as any as FunctionFragment,
+        [currentRoundId]
+      )
+    )[0]
+  );
+  // const lastRoundId = currentRoundId - BigInt(1);
+  console.log(
+    "Current round ID",
+    currentRoundId.toString(),
+    currentRoundSnapshot.toString()
+  );
+
   const rootStakedB3tr = BigInt(
     (
       await thor.contracts.executeCall(
@@ -204,7 +229,7 @@ export const distributeVot3 = async (
 
   const rootClauses = [];
   for (
-    let accountIndex = 0;
+    let accountIndex = 20000;
     accountIndex < amountOfAccounts;
     accountIndex += 1
   ) {
@@ -232,34 +257,46 @@ export const distributeVot3 = async (
         throw new Error("Signer is null");
       }
 
-      const [[b3trBalanceResult], [vot3BalanceResult], [delegate]] =
-        await Promise.all([
-          thor.contracts.executeCall(
-            Addresses.b3tr,
-            "balanceOf(address) returns(uint256)" as any as FunctionFragment,
-            [wallet.address]
-          ),
-          thor.contracts.executeCall(
-            Addresses.vot3,
-            "balanceOf(address) returns(uint256)" as any as FunctionFragment,
-            [wallet.address]
-          ),
-          thor.contracts.executeCall(
-            Addresses.vot3,
-            "delegates(address) returns(address)" as any as FunctionFragment,
-            [wallet.address]
-          ),
-        ]);
+      const [
+        [b3trBalanceResult],
+        [vot3BalanceResult],
+        [delegate],
+        [availableVotes],
+      ] = await Promise.all([
+        thor.contracts.executeCall(
+          Addresses.b3tr,
+          "balanceOf(address) returns(uint256)" as any as FunctionFragment,
+          [wallet.address]
+        ),
+        thor.contracts.executeCall(
+          Addresses.vot3,
+          "balanceOf(address) returns(uint256)" as any as FunctionFragment,
+          [wallet.address]
+        ),
+        thor.contracts.executeCall(
+          Addresses.vot3,
+          "delegates(address) returns(address)" as any as FunctionFragment,
+          [wallet.address]
+        ),
+        thor.contracts.executeCall(
+          Addresses.gov,
+          "getVotes(address,uint256) returns(uint256)" as any as FunctionFragment,
+          [wallet.address, currentRoundSnapshot]
+        ),
+      ]);
 
       let b3trBalance = BigInt(b3trBalanceResult);
       let vot3Balance = BigInt(vot3BalanceResult);
+      let availableVotesAmount = BigInt(availableVotes);
 
       console.log("#", accountIndex, "/", amountOfAccounts, wallet.address);
       console.log(
         "B3TR:",
         formatUnits(b3trBalance),
         "VOT3:",
-        formatUnits(vot3Balance)
+        formatUnits(vot3Balance),
+        "AVAILABLE VOTES: ",
+        formatUnits(availableVotesAmount)
       );
 
       if (
@@ -339,6 +376,7 @@ export const distributeVot3 = async (
         });
       }
 
+      // Unstake
       if (vot3Balance > depositAmount) {
         const stakedB3tr = BigInt(
           (
@@ -492,8 +530,9 @@ export const distributeVot3 = async (
       }
 
       if (
-        rootClauses.length >= 125 ||
-        (accountIndex === amountOfAccounts - 1 && rootClauses.length > 0)
+        rootClauses.length >= 125
+        // ||
+        // (accountIndex === amountOfAccounts - 1 && rootClauses.length > 0)
       ) {
         await thor.contracts.executeMultipleClausesTransaction(
           rootClauses,
