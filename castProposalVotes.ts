@@ -1,9 +1,12 @@
 import {
+  confirmVoteForProposal,
   confirmVoteRound,
   confirmVoteWithRootSigner,
   getAmountOfAccounts,
+  getProposalId,
   getRootSigner,
   getStartIndex,
+  getVoteType,
 } from "./helpers/CliArguments";
 import {
   ThorClient,
@@ -43,23 +46,33 @@ async function main() {
 
   console.log(`Root signer address: ${rootAccount.address}`);
 
+  const proposalId = await getProposalId();
+  const voteType = await getVoteType();
+
   const proceedRootVote = await confirmVoteWithRootSigner();
   if (proceedRootVote) {
-    await voteForAppsWithRootSigner(rootWallet, rootSigner);
+    await castVotesWithRootSigner(rootWallet, proposalId, voteType, rootSigner);
   }
 
-  const proceed = await confirmVoteRound();
+  const proceed = await confirmVoteForProposal();
   if (!proceed) {
     console.log("Exiting...");
     return;
   }
 
-  // Vote for apps
-  await voteForApps(amountOfAccounts, rootWallet, startIndex);
+  await castVotes(
+    amountOfAccounts,
+    rootWallet,
+    proposalId,
+    voteType,
+    startIndex
+  );
 }
 
-const voteForAppsWithRootSigner = async (
+const castVotesWithRootSigner = async (
   rootWallet: HDNodeWallet,
+  proposalId: string,
+  voteType: number,
   rootSigner: VeChainSigner
 ) => {
   const currentRoundId = BigInt(
@@ -109,14 +122,14 @@ const voteForAppsWithRootSigner = async (
       [rootWallet.address]
     ),
     thor.contracts.executeCall(
-      Addresses.gov,
+      Addresses.b3trGovernor,
       "getVotes(address,uint256) returns(uint256)" as any as FunctionFragment,
       [rootWallet.address, currentRoundSnapshot]
     ),
     thor.contracts.executeCall(
-      Addresses.gov,
+      Addresses.b3trGovernor,
       "hasVoted(uint256,address) returns(bool)" as any as FunctionFragment,
-      [currentRoundId, rootWallet.address]
+      [proposalId, rootWallet.address]
     ),
   ]);
 
@@ -142,20 +155,20 @@ const voteForAppsWithRootSigner = async (
 
     console.log("Voting for random app");
 
-    const randomIndex = Math.floor(Math.random() * appIds.length);
-    const appId = appIds[randomIndex];
     await thor.contracts.executeTransaction(
       rootSigner,
-      Addresses.gov,
-      "function castVote(uint256 roundId, bytes32[] memory appIds, uint256[] memory voteWeights)" as any as FunctionFragment,
-      [currentRoundId, [appId], [availableVotesAmount]]
+      Addresses.b3trGovernor,
+      "function castVote(uint256 proposalId, uint8 support)" as any as FunctionFragment,
+      [proposalId, voteType]
     );
   }
 };
 
-const voteForApps = async (
+const castVotes = async (
   amountOfAccounts: number,
   rootWallet: HDNodeWallet,
+  proposalId: string,
+  voteType: number,
   startIndex: number
 ) => {
   const currentRoundId = BigInt(
@@ -234,14 +247,14 @@ const voteForApps = async (
           [wallet.address]
         ),
         thor.contracts.executeCall(
-          Addresses.gov,
+          Addresses.b3trGovernor,
           "getVotes(address,uint256) returns(uint256)" as any as FunctionFragment,
           [wallet.address, currentRoundSnapshot]
         ),
         thor.contracts.executeCall(
-          Addresses.gov,
+          Addresses.b3trGovernor,
           "hasVoted(uint256,address) returns(bool)" as any as FunctionFragment,
-          [currentRoundId, wallet.address]
+          [proposalId, wallet.address]
         ),
       ]);
 
@@ -262,19 +275,16 @@ const voteForApps = async (
         hasVoted
       );
 
-      // vote in same TX to save gas, duplicate code
       if (availableVotesAmount > BigInt(0) && !hasVoted) {
         hasVoted = true;
 
-        console.log("Voting for random app");
+        console.log("Voting for proposal");
 
-        const randomIndex = Math.floor(Math.random() * appIds.length);
-        const appId = appIds[randomIndex];
         await thor.contracts.executeTransaction(
           signer,
-          Addresses.gov,
-          "function castVote(uint256 roundId, bytes32[] memory appIds, uint256[] memory voteWeights)" as any as FunctionFragment,
-          [currentRoundId, [appId], [availableVotesAmount]]
+          Addresses.b3trGovernor,
+          "function castVote(uint256 proposalId, uint8 support)" as any as FunctionFragment,
+          [proposalId, voteType]
         );
       }
     } catch (err) {

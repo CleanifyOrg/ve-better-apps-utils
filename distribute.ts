@@ -3,6 +3,7 @@ import {
   confirmVot3Swap,
   getAmountOfAccounts,
   getRootSigner,
+  getStartIndex,
 } from "./helpers/CliArguments";
 import {
   ThorClient,
@@ -22,7 +23,7 @@ import {
 } from "ethers";
 import { Addresses } from "./helpers/constants";
 import { B3trAbi, Vot3Abi } from "./helpers/Abis";
-const thor = ThorClient.fromUrl("https://node.vechain.energy");
+const thor = ThorClient.fromUrl("https://de.node.vechain.energy");
 const sleep = (s: number) =>
   new Promise((resolve) => setTimeout(resolve, s * 1000));
 const depositAmount = ethers.parseUnits("1");
@@ -31,6 +32,7 @@ async function main() {
   // Ask user the amount of accounts to distribute to and the root signer mnemonic
   const amountOfAccounts = await getAmountOfAccounts();
   const mnemonic = await getRootSigner();
+  const startIndex = await getStartIndex();
 
   // Retrieve the root signer wallet and account, WARNING: uses the ethereum derivation path
   const rootWallet = Wallet.fromPhrase(mnemonic);
@@ -104,7 +106,8 @@ async function main() {
       amountOfAccounts,
       rootB3trBalance,
       rootVot3Balance,
-      rootAccount
+      rootAccount,
+      startIndex
     );
   }
 }
@@ -186,7 +189,8 @@ export const distributeVot3 = async (
   amountOfAccounts: number,
   rootB3trBalance: BigInt,
   rootVot3Balance: BigInt,
-  rootAccount: { address: string; privateKey: Buffer }
+  rootAccount: { address: string; privateKey: Buffer },
+  startIndex: number
 ) => {
   const B3TR = new Contract(Addresses.b3tr, B3trAbi, thor, rootSigner);
   const VOT3 = new Contract(Addresses.vot3, Vot3Abi, thor, rootSigner);
@@ -229,7 +233,7 @@ export const distributeVot3 = async (
 
   const rootClauses = [];
   for (
-    let accountIndex = 0;
+    let accountIndex = startIndex;
     accountIndex < amountOfAccounts;
     accountIndex += 1
   ) {

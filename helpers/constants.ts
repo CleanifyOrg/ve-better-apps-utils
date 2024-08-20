@@ -4,6 +4,7 @@ export const Addresses = {
   rewarder: "0x838A33AF756a6366f93e201423E1425f67eC0Fa7",
   gov: "0x89A00Bb0947a30FF95BEeF77a66AEdE3842Fe5B7",
   nft: "0x93B8cD34A7Fc4f53271b9011161F7A2B5fEA9D1F",
+  b3trGovernor: "0x1c65C25fABe2fc1bCb82f253fA0C916a322f777C",
 };
 
 export const appIds = [
