@@ -6,7 +6,8 @@
     "distribute": "ts-node distribute.ts",
     "cast-round-vote": "ts-node castRoundVotes.ts",
     "cast-proposal-vote": "ts-node castProposalVotes.ts",
-    "claim": "ts-node claim.ts"
+    "claim": "ts-node claim.ts",
+    "convert-to-b3tr": "ts-node convert.ts"
   },
   "dependencies": {
     "@vechain/sdk-core": "^1.0.0-beta.29",

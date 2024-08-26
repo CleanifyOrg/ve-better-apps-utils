@@ -218,6 +218,57 @@ export const confirmVoteWhileClaiming = async (): Promise<boolean> => {
   return res.answer === "Yes";
 };
 
+export const confirmConvertVot3ToB3tr = async (): Promise<boolean> => {
+  const res = await enquirer.prompt<ConfirmationResponse>([
+    {
+      type: "select",
+      name: "answer",
+      message: `Do you want to convert all the VOT3 tokens on the root account?`,
+      choices: ["No", "Yes"],
+    },
+  ]);
+
+  return res.answer === "Yes";
+};
+
+export const transferTokensFromRoot = async (): Promise<boolean> => {
+  const res = await enquirer.prompt<ConfirmationResponse>([
+    {
+      type: "select",
+      name: "answer",
+      message: `Do you want to transfer the tokens?`,
+      choices: ["No", "Yes"],
+    },
+  ]);
+
+  return res.answer === "Yes";
+};
+
+export const genericConfirmation = async (): Promise<boolean> => {
+  const res = await enquirer.prompt<ConfirmationResponse>([
+    {
+      type: "select",
+      name: "answer",
+      message: `Are you sure you want to proceed?`,
+      choices: ["No", "Yes"],
+    },
+  ]);
+
+  return res.answer === "Yes";
+};
+
+export const getReceiver = async (): Promise<string> => {
+  const res = await enquirer.prompt<{ receiver: string }>([
+    {
+      type: "input",
+      name: "receiver",
+      message: "Enter the address of the receiver",
+    },
+  ]);
+
+  return res.receiver;
+};
+
 export const confirmVoteForProposal = async (): Promise<boolean> => {
   const res = await enquirer.prompt<ConfirmationResponse>([
     {
