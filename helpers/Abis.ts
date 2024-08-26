@@ -156,3 +156,24 @@ export const GovAbi = [
     type: "function",
   },
 ];
+
+export const RewarderAbi = [
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "cycle",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "voter",
+        type: "address",
+      },
+    ],
+    name: "claimReward",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];

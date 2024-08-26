@@ -79,6 +79,29 @@ export const getProposalId = async (): Promise<string> => {
   return res.proposalId;
 };
 
+export const getRoundId = async (): Promise<number> => {
+  const res = await enquirer.prompt<{ roundId: string }>([
+    {
+      type: "input",
+      name: "roundId",
+      message: "For which round do you want to claim rewards?",
+      validate: (input) => {
+        if (isNaN(Number(input))) {
+          return "Please enter a valid number";
+        }
+        return true;
+      },
+    },
+  ]);
+
+  const roundId = parseInt(res.roundId);
+  if (isNaN(roundId)) {
+    logger.error("Please enter a valid number");
+    return getRoundId();
+  }
+  return roundId;
+};
+
 export const getVoteType = async (): Promise<number> => {
   const res = await enquirer.prompt<ConfirmationResponse>([
     {
@@ -149,6 +172,45 @@ export const confirmVoteWithRootSigner = async (): Promise<boolean> => {
       type: "select",
       name: "answer",
       message: `Proceed with voting with the root signer?`,
+      choices: ["No", "Yes"],
+    },
+  ]);
+
+  return res.answer === "Yes";
+};
+
+export const confirmClaimRewardsWithRoot = async (): Promise<boolean> => {
+  const res = await enquirer.prompt<ConfirmationResponse>([
+    {
+      type: "select",
+      name: "answer",
+      message: `Proceed with claiming rewards with the root signer?`,
+      choices: ["No", "Yes"],
+    },
+  ]);
+
+  return res.answer === "Yes";
+};
+
+export const confirmClaimRewards = async (): Promise<boolean> => {
+  const res = await enquirer.prompt<ConfirmationResponse>([
+    {
+      type: "select",
+      name: "answer",
+      message: `Proceed with claiming rewards?`,
+      choices: ["No", "Yes"],
+    },
+  ]);
+
+  return res.answer === "Yes";
+};
+
+export const confirmVoteWhileClaiming = async (): Promise<boolean> => {
+  const res = await enquirer.prompt<ConfirmationResponse>([
+    {
+      type: "select",
+      name: "answer",
+      message: `Do you also want to cast your votes for current round?`,
       choices: ["No", "Yes"],
     },
   ]);
