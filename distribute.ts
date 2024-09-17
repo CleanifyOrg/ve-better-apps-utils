@@ -26,7 +26,7 @@ import { B3trAbi, Vot3Abi } from "./helpers/Abis";
 const thor = ThorClient.fromUrl("https://de.node.vechain.energy");
 const sleep = (s: number) =>
   new Promise((resolve) => setTimeout(resolve, s * 1000));
-const depositAmount = ethers.parseUnits("1");
+const depositAmount = ethers.parseUnits("0");
 
 async function main() {
   // Ask user the amount of accounts to distribute to and the root signer mnemonic
@@ -93,23 +93,23 @@ async function main() {
     console.log("Root signer has no B3TR to convert.");
   }
 
-  if (rootVot3Balance > BigInt(0)) {
-    const proceed = await confirmVot3Distribution();
-    if (!proceed) {
-      console.log("Exiting...");
-      return;
-    }
-
-    await distributeVot3(
-      rootSigner,
-      rootWallet,
-      amountOfAccounts,
-      rootB3trBalance,
-      rootVot3Balance,
-      rootAccount,
-      startIndex
-    );
+  // if (rootVot3Balance > BigInt(0)) {
+  const proceed = await confirmVot3Distribution();
+  if (!proceed) {
+    console.log("Exiting...");
+    return;
   }
+
+  await distributeVot3(
+    rootSigner,
+    rootWallet,
+    amountOfAccounts,
+    rootB3trBalance,
+    rootVot3Balance,
+    rootAccount,
+    startIndex
+  );
+  // }
 }
 
 export const convertToVot3 = async (
@@ -448,34 +448,31 @@ export const distributeVot3 = async (
           });
         }
 
-        await (
-          await thor.contracts.executeMultipleClausesTransaction(
-            clauses,
-            signer
-          )
-        ).wait();
-        await sleep(10);
+        // await (
+        thor.contracts.executeMultipleClausesTransaction(clauses, signer);
+        // ).wait();
+        await sleep(1);
 
-        b3trBalance = BigInt(
-          (
-            await thor.contracts.executeCall(
-              Addresses.b3tr,
-              "balanceOf(address) returns(uint256)" as any as FunctionFragment,
-              [wallet.address]
-            )
-          )[0]
-        );
-        vot3Balance = BigInt(
-          (
-            await thor.contracts.executeCall(
-              Addresses.vot3,
-              "balanceOf(address) returns(uint256)" as any as FunctionFragment,
-              [wallet.address]
-            )
-          )[0]
-        );
+        // b3trBalance = BigInt(
+        //   (
+        //     await thor.contracts.executeCall(
+        //       Addresses.b3tr,
+        //       "balanceOf(address) returns(uint256)" as any as FunctionFragment,
+        //       [wallet.address]
+        //     )
+        //   )[0]
+        // );
+        // vot3Balance = BigInt(
+        //   (
+        //     await thor.contracts.executeCall(
+        //       Addresses.vot3,
+        //       "balanceOf(address) returns(uint256)" as any as FunctionFragment,
+        //       [wallet.address]
+        //     )
+        //   )[0]
+        // );
 
-        console.log("Balance after unstake", b3trBalance, vot3Balance);
+        // console.log("Balance after unstake", b3trBalance, vot3Balance);
       }
 
       if (b3trBalance > BigInt(0)) {
