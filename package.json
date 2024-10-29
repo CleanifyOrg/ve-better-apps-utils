@@ -1,5 +1,5 @@
 {
-  "name": "sybil-dan",
+  "name": "vechain-scripts-sdk",
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
@@ -8,12 +8,15 @@
     "cast-proposal-vote": "ts-node castProposalVotes.ts",
     "claim": "ts-node claim.ts",
     "convert-to-b3tr": "ts-node convert.ts",
-    "test": "ts-node test.ts"
+    "test": "ts-node test.ts",
+    "get-privy-users": "ts-node getCleanifyPrivyUsers.ts"
   },
   "dependencies": {
+    "@privy-io/server-auth": "^1.14.5-beta-20241021144601",
     "@vechain/sdk-core": "^1.0.0-beta.31",
     "@vechain/sdk-network": "^1.0.0-beta.31",
     "@vechain/vebetterdao-contracts": "^2.0.0",
+    "csv-writer": "^1.6.0",
     "enquirer": "^2.4.1",
     "inquirer": "^10.1.8",
     "winston": "^3.14.2"
