@@ -1,6 +1,6 @@
 ## Prerequisites
 
-Before using Sybil-Dan, ensure you have the following installed on your machine:
+Before using vechain scripts, ensure you have the following installed on your machine:
 
 - Node.js (v14.x or higher)
 - yarn orn npm
@@ -17,8 +17,8 @@ yarn install
 Navigate to the project directory:
 
     ```bash
-    git clone https://github.com/your-username/sybil-dan.git
-    cd sybil-dan
+    git clone
+    cd vechain-scripts
     yarn
     ```
 
