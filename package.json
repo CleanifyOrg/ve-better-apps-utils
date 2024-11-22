@@ -9,7 +9,8 @@
     "claim": "ts-node claim.ts",
     "convert-to-b3tr": "ts-node convert.ts",
     "test": "ts-node test.ts",
-    "get-privy-users": "ts-node getCleanifyPrivyUsers.ts"
+    "get-privy-users": "ts-node getCleanifyPrivyUsers.ts",
+    "fetch-b3tr-transfers": "ts-node fetchB3TRTransfers.ts"
   },
   "dependencies": {
     "@privy-io/server-auth": "^1.14.5-beta-20241021144601",
