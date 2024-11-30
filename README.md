@@ -1,4 +1,4 @@
-This repository contains utilities for the VeBetterDAO x2Earn applications.
+This repository contains utility scripts that can be used by x2Earn applications of the VeBetterDAO ecosystem.
 
 ## Utils
 
