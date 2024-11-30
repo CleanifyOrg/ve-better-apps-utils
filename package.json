@@ -1,22 +1,14 @@
 {
-  "name": "vechain-scripts-sdk",
+  "name": "vbd-x2earn-utils",
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "distribute": "ts-node distribute.ts",
-    "cast-round-vote": "ts-node castRoundVotes.ts",
-    "cast-proposal-vote": "ts-node castProposalVotes.ts",
-    "claim": "ts-node claim.ts",
-    "convert-to-b3tr": "ts-node convert.ts",
-    "test": "ts-node test.ts",
-    "get-privy-users": "ts-node getCleanifyPrivyUsers.ts",
-    "fetch-b3tr-transfers": "ts-node fetchB3TRTransfers.ts"
+    "reward-endorsers": "ts-node rewardEndorsers.ts"
   },
   "dependencies": {
-    "@privy-io/server-auth": "^1.14.5-beta-20241021144601",
     "@vechain/sdk-core": "^1.0.0-beta.31",
     "@vechain/sdk-network": "^1.0.0-beta.31",
-    "@vechain/vebetterdao-contracts": "^2.0.0",
+    "@vechain/vebetterdao-contracts": "^4.1.0",
     "csv-writer": "^1.6.0",
     "enquirer": "^2.4.1",
     "inquirer": "^10.1.8",

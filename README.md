@@ -1,3 +1,9 @@
+This repository contains utilities for the VeBetterDAO x2Earn applications.
+
+## Utils
+
+- `rewardEndorsers.ts`: Distribute rewards to endorsers for a given round and application.
+
 ## Prerequisites
 
 Before using vechain scripts, ensure you have the following installed on your machine:
@@ -18,24 +24,12 @@ Navigate to the project directory:
 
     ```bash
     git clone
-    cd vechain-scripts
+    cd cleanify-endorsers-rewards
     yarn
     ```
 
-Distribute / Withdraw tokens:
+Distrbute rewards to endorsers by running:
 
     ```bash
-    yarn distribute
-    ```
-
-Vote for random apps:
-
-    ````bash
-    yarn cast-round-vote
-    ````
-
-Vote for proposal:
-
-    ```bash
-    yarn cast-proposal-vote
+    yarn reward-endorsers
     ```

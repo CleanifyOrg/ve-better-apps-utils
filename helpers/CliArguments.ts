@@ -1,39 +1,12 @@
 import enquirer from "enquirer";
 import { logger } from "./Logger";
 
-type AmountOfAccountsResponse = {
-  amount: string;
-};
-
 type ConfirmationResponse = {
   answer: "No" | "Yes";
 };
 
-export const getAmountOfAccounts = async (): Promise<number> => {
-  const res = await enquirer.prompt<AmountOfAccountsResponse>([
-    {
-      type: "input",
-      name: "amount",
-      message: "How many accounts do you want to use?",
-      validate: (input) => {
-        if (isNaN(Number(input))) {
-          return "Please enter a valid number";
-        }
-        return true;
-      },
-    },
-  ]);
-
-  const amountOfAccounts = parseInt(res.amount);
-  if (isNaN(amountOfAccounts)) {
-    logger.error("Please enter a valid number");
-    return getAmountOfAccounts();
-  }
-  return amountOfAccounts;
-};
-
 export const getStartIndex = async (): Promise<number> => {
-  const res = await enquirer.prompt<AmountOfAccountsResponse>([
+  const res = await enquirer.prompt<{ amount: string }>([
     {
       type: "input",
       name: "amount",
@@ -67,18 +40,6 @@ export const getRootSigner = async (): Promise<string> => {
   return res.rootSigner;
 };
 
-export const getProposalId = async (): Promise<string> => {
-  const res = await enquirer.prompt<{ proposalId: string }>([
-    {
-      type: "input",
-      name: "proposalId",
-      message: "Enter the id of the proposal you want to vote on",
-    },
-  ]);
-
-  return res.proposalId;
-};
-
 export const getRoundId = async (): Promise<number> => {
   const res = await enquirer.prompt<{ roundId: string }>([
     {
@@ -102,148 +63,6 @@ export const getRoundId = async (): Promise<number> => {
   return roundId;
 };
 
-export const getVoteType = async (): Promise<number> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `What do you want to vote for?`,
-      choices: ["No", "Yes", "Abstain"],
-    },
-  ]);
-
-  if (res.answer === "No") {
-    return 0;
-  }
-
-  if (res.answer === "Yes") {
-    return 1;
-  }
-
-  if (res.answer === "Abstain") {
-    return 2;
-  }
-
-  throw new Error("Invalid vote type");
-};
-
-export const confirmVot3Swap = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `Proceed with swapping B3TR for VOT3 on the root account?`,
-      choices: ["No", "Yes"],
-    },
-  ]);
-
-  return res.answer === "Yes";
-};
-
-export const confirmVot3Distribution = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `Proceed with distributing VOT3 to the other addresses?`,
-      choices: ["No", "Yes"],
-    },
-  ]);
-
-  return res.answer === "Yes";
-};
-
-export const confirmVoteRound = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `Proceed with equaly voting for apps in this round?`,
-      choices: ["No", "Yes"],
-    },
-  ]);
-
-  return res.answer === "Yes";
-};
-
-export const confirmVoteWithRootSigner = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `Proceed with voting with the root signer?`,
-      choices: ["No", "Yes"],
-    },
-  ]);
-
-  return res.answer === "Yes";
-};
-
-export const confirmClaimRewardsWithRoot = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `Proceed with claiming rewards with the root signer?`,
-      choices: ["No", "Yes"],
-    },
-  ]);
-
-  return res.answer === "Yes";
-};
-
-export const confirmClaimRewards = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `Proceed with claiming rewards?`,
-      choices: ["No", "Yes"],
-    },
-  ]);
-
-  return res.answer === "Yes";
-};
-
-export const confirmVoteWhileClaiming = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `Do you also want to cast your votes for current round?`,
-      choices: ["No", "Yes"],
-    },
-  ]);
-
-  return res.answer === "Yes";
-};
-
-export const confirmConvertVot3ToB3tr = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `Do you want to convert all the VOT3 tokens on the root account?`,
-      choices: ["No", "Yes"],
-    },
-  ]);
-
-  return res.answer === "Yes";
-};
-
-export const transferTokensFromRoot = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
-    {
-      type: "select",
-      name: "answer",
-      message: `Do you want to transfer the tokens?`,
-      choices: ["No", "Yes"],
-    },
-  ]);
-
-  return res.answer === "Yes";
-};
-
 export const genericConfirmation = async (): Promise<boolean> => {
   const res = await enquirer.prompt<ConfirmationResponse>([
     {
@@ -257,27 +76,72 @@ export const genericConfirmation = async (): Promise<boolean> => {
   return res.answer === "Yes";
 };
 
-export const getReceiver = async (): Promise<string> => {
-  const res = await enquirer.prompt<{ receiver: string }>([
-    {
-      type: "input",
-      name: "receiver",
-      message: "Enter the address of the receiver",
-    },
-  ]);
-
-  return res.receiver;
-};
-
-export const confirmVoteForProposal = async (): Promise<boolean> => {
-  const res = await enquirer.prompt<ConfirmationResponse>([
+export const getEnvironment = async (): Promise<
+  "local" | "testnet" | "mainnet"
+> => {
+  const res = await enquirer.prompt<{
+    environment: "local" | "testnet" | "mainnet";
+  }>([
     {
       type: "select",
-      name: "answer",
-      message: `Proceed with voting for the proposal?`,
-      choices: ["No", "Yes"],
+      name: "environment",
+      message: "Which environment do you want to use?",
+      choices: ["local", "testnet", "mainnet"],
     },
   ]);
 
-  return res.answer === "Yes";
+  return res.environment;
+};
+
+export const getAppId = async (): Promise<number> => {
+  const res = await enquirer.prompt<{ appId: string }>([
+    {
+      type: "input",
+      name: "appId",
+      message: "Enter the application ID:",
+      validate: (input) => {
+        if (isNaN(Number(input))) {
+          return "Please enter a valid number";
+        }
+        return true;
+      },
+    },
+  ]);
+
+  const appId = parseInt(res.appId);
+  if (isNaN(appId)) {
+    logger.error("Please enter a valid number");
+    return getAppId();
+  }
+  return appId;
+};
+
+export const selectApp = async (apps: any[]): Promise<string> => {
+  // Format apps for display
+  const choices = apps.map((app, index) => ({
+    name: `${app.name} (${formatAppId(app.id)})`,
+    value: app.id,
+  }));
+
+  const res = await enquirer.prompt<{ selectedApp: string }>([
+    {
+      type: "select",
+      name: "selectedApp",
+      message: "Select an app:",
+      choices: choices,
+    },
+  ]);
+
+  // Find the selected app and return its value
+  const selectedChoice = choices.find(
+    (choice) => choice.name === res.selectedApp
+  );
+  return selectedChoice ? selectedChoice.value : res.selectedApp;
+};
+
+// Helper function to format app ID
+const formatAppId = (id: string | number): string => {
+  const idString = id.toString();
+  if (idString.length <= 8) return idString;
+  return `${idString.slice(0, 6)}...${idString.slice(-8)}`;
 };
