@@ -2,7 +2,7 @@ This repository contains utilities for the VeBetterDAO x2Earn applications.
 
 ## Utils
 
-- `rewardEndorsers.ts`: Distribute rewards to endorsers for a given round and application.
+- `Reward Endorsers`: Distribute rewards to endorsers for a given round and application.
 
 ## Prerequisites
 
