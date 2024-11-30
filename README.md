@@ -12,12 +12,6 @@ Before using vechain scripts, ensure you have the following installed on your ma
 - yarn orn npm
 - Typescript (v5.x or higher)
 
-## Setup
-
-```bash
-yarn install
-```
-
 ## Usage
 
 Navigate to the project directory:
