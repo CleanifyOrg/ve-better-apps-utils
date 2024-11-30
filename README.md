@@ -24,7 +24,7 @@ Navigate to the project directory:
 
 ```bash
 git clone
-cd cleanify-endorsers-rewards
+cd ve-better-apps-utils
 yarn
 ```
 
