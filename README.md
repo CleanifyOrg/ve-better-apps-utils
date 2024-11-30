@@ -22,14 +22,14 @@ yarn install
 
 Navigate to the project directory:
 
-    ```bash
-    git clone
-    cd cleanify-endorsers-rewards
-    yarn
-    ```
+```bash
+git clone
+cd cleanify-endorsers-rewards
+yarn
+```
 
 Distrbute rewards to endorsers by running:
 
-    ```bash
-    yarn reward-endorsers
-    ```
+```bash
+yarn reward-endorsers
+```
