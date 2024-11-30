@@ -145,3 +145,30 @@ const formatAppId = (id: string | number): string => {
   if (idString.length <= 8) return idString;
   return `${idString.slice(0, 6)}...${idString.slice(-8)}`;
 };
+
+export const getEndorserAllocationPercentage = async (): Promise<number> => {
+  const res = await enquirer.prompt<{ percentage: string }>([
+    {
+      type: "input",
+      name: "percentage",
+      message: "What percentage do you want to allocate to endorsers? (0-100)",
+      validate: (input) => {
+        const num = Number(input);
+        if (isNaN(num)) {
+          return "Please enter a valid number";
+        }
+        if (num < 0 || num > 100) {
+          return "Percentage must be between 0 and 100";
+        }
+        return true;
+      },
+    },
+  ]);
+
+  const percentage = parseFloat(res.percentage);
+  if (isNaN(percentage)) {
+    logger.error("Please enter a valid number");
+    return getEndorserAllocationPercentage();
+  }
+  return percentage;
+};

@@ -10,6 +10,8 @@ import {
   getAppId,
   getRoundId,
   selectApp,
+  getEndorserAllocationPercentage,
+  genericConfirmation,
 } from "./helpers/CliArguments";
 import { getConfig } from "./config";
 import { log } from "winston";
@@ -49,7 +51,10 @@ async function main() {
     );
 
     // calculate the 5% reward entitled to the endorsers
-    const reward = (appEarningsResult * BigInt(5)) / BigInt(100);
+    const endorserAllocationPercentage =
+      await getEndorserAllocationPercentage();
+    const reward =
+      (appEarningsResult * BigInt(endorserAllocationPercentage)) / BigInt(100);
 
     // Retrieve the endorsers
     // Call getEndorsers function
@@ -63,6 +68,11 @@ async function main() {
     const endorsers = endorsersResult as string[];
 
     console.log("Number of endorsers:", endorsers.length);
+    console.log(
+      "Total reward to distribute:",
+      unitsUtils.formatUnits(reward),
+      "B3TR"
+    );
 
     // Create a single array to store all endorser information
     const endorserInfo: { address: string; score: bigint; amount: bigint }[] =
@@ -110,6 +120,14 @@ async function main() {
       console.log(`Reward: ${unitsUtils.formatUnits(info.amount)} B3TR`);
       console.log("-------------------");
     }
+
+    const confirm = await genericConfirmation();
+    if (!confirm) {
+      console.log("Distribution cancelled by user");
+      return;
+    }
+
+    // TODO: Distribute rewards
   } catch (error) {
     console.error("Error fetching endorsers:", error);
   }
