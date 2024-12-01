@@ -1,7 +1,20 @@
-import { ThorClient } from "@vechain/sdk-network";
-import { abi, unitsUtils } from "@vechain/sdk-core";
+import {
+  ProviderInternalBaseWallet,
+  ProviderInternalHDWallet,
+  ThorClient,
+  VeChainProvider,
+} from "@vechain/sdk-network";
+import {
+  abi,
+  Address,
+  coder,
+  FunctionFragment,
+  unitsUtils,
+} from "@vechain/sdk-core";
+import { Interface } from "ethers";
 import {
   X2EarnApps,
+  X2EarnRewardsPool,
   XAllocationPool,
   XAllocationVoting,
 } from "@vechain/vebetterdao-contracts";
@@ -12,6 +25,8 @@ import {
   selectApp,
   getEndorserAllocationPercentage,
   genericConfirmation,
+  getRootSigner,
+  getStartIndex,
 } from "./helpers/CliArguments";
 import { getConfig } from "./config";
 import { log } from "winston";
@@ -121,13 +136,74 @@ async function main() {
       console.log("-------------------");
     }
 
-    const confirm = await genericConfirmation();
+    let confirm = await genericConfirmation();
     if (!confirm) {
       console.log("Distribution cancelled by user");
       return;
     }
 
-    // TODO: Distribute rewards
+    const mnemonic = await getRootSigner();
+    const provider = new VeChainProvider(
+      thorClient,
+      new ProviderInternalHDWallet(
+        mnemonic.split(" "),
+        1,
+        0,
+        "m/44'/818'/0'/0"
+      ),
+      false
+    );
+    const signer = await provider.getSigner();
+
+    if (!signer) {
+      throw new Error("Signer is null");
+    }
+
+    const proof = {
+      version: 2,
+      description: "Endorsement rewards for round " + roundId,
+      proof: {},
+      impact: {},
+    };
+
+    const clauses = [];
+    const logs = [];
+    for (const info of endorserInfo) {
+      logs.push(
+        `Distributing ${unitsUtils.formatUnits(info.amount)} B3TR to ${
+          info.address
+        }`
+      );
+
+      clauses.push({
+        clause: {
+          to: config.x2EarnRewardsPoolContractAddress,
+          value: "0x0",
+          data: new Interface(X2EarnRewardsPool.abi).encodeFunctionData(
+            "distributeRewardDeprecated",
+            [selectedAppId, info.amount, info.address, JSON.stringify(proof)]
+          ),
+        },
+        functionFragment: coder
+          .createInterface(X2EarnRewardsPool.abi)
+          .getFunction("distributeRewardDeprecated") as FunctionFragment,
+      });
+    }
+
+    confirm = await genericConfirmation();
+    if (!confirm) {
+      console.log("Distribution cancelled by user");
+      return;
+    }
+
+    console.log(logs);
+
+    const tx = await thorClient.contracts.executeMultipleClausesTransaction(
+      clauses,
+      signer
+    );
+
+    console.log("Transaction sent:", tx);
   } catch (error) {
     console.error("Error fetching endorsers:", error);
   }

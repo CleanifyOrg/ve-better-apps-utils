@@ -45,7 +45,7 @@ export const getRoundId = async (): Promise<number> => {
     {
       type: "input",
       name: "roundId",
-      message: "For which round do you want to claim rewards?",
+      message: "For which round do you want to reward endorsers?",
       validate: (input) => {
         if (isNaN(Number(input))) {
           return "Please enter a valid number";
@@ -76,17 +76,15 @@ export const genericConfirmation = async (): Promise<boolean> => {
   return res.answer === "Yes";
 };
 
-export const getEnvironment = async (): Promise<
-  "local" | "testnet" | "mainnet"
-> => {
+export const getEnvironment = async (): Promise<"local" | "mainnet"> => {
   const res = await enquirer.prompt<{
-    environment: "local" | "testnet" | "mainnet";
+    environment: "local" | "mainnet";
   }>([
     {
       type: "select",
       name: "environment",
       message: "Which environment do you want to use?",
-      choices: ["local", "testnet", "mainnet"],
+      choices: ["local", "mainnet"],
     },
   ]);
 
